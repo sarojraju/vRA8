@@ -1,0 +1,62 @@
+formatVersion: 1
+inputs:
+  inFlavor:
+    type: string
+    title: Select the Flavor (CPU/memory size)
+    enum:
+      - xsmall
+      - small
+      - medium
+      - large
+  inCellType:
+    type: string
+    title: Select provisioning type
+    enum:
+      - iaas
+      - pks
+      - pcf
+  inLicense:
+    type: string
+    title: 'Select a license, if required'
+    oneOf:
+      - title: None
+        const: none
+      - title: RedHat
+        const: rhat
+      - title: Oracle
+        const: oracle
+      - title: Microsoft SQL
+        const: mssql
+  inCMI:
+    type: string
+    oneOf:
+      - title: Windows With IIS
+        const: windows2019IIS
+      - title: CentOS
+        const: CentOS
+resources:
+  vsphere01:
+    type: Cloud.vSphere.Machine
+    metadata:
+      layoutPosition:
+        - 0
+        - 0
+    properties:
+      tags:
+        - key: license
+          value: '${input.inLicense}'
+      image: centos
+      flavor: '${input.inFlavor}'
+      constraints:
+        - tag: 'cell:${input.inCellType}'
+      networks:
+        - network: '${resource.baseNetwork.id}'
+      customizationSpec: Linux
+  baseNetwork:
+    type: Cloud.vSphere.Network
+    metadata:
+      layoutPosition:
+        - 1
+        - 0
+    properties:
+      networkType: existing
